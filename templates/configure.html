@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h3>{{ session.trigger }}</h3>
+
+<div style="color: gray;">
+{% for item in session.history %}
+<p><b>{{ item.question }}</b><br>{{ item.answer }}</p>
+{% endfor %}
+</div>
+
+{% if question %}
+<form method="post" action="/answer/{{ sid }}">
+
+<p><b>{{ question.question }}</b></p>
+
+{% if question.type == "multi" %}
+    {% for opt in question.options %}
+        <input type="checkbox" name="{{ question.field }}" value="{{ opt }}"> {{ opt }}<br>
+    {% endfor %}
+
+{% elif question.type == "toggle" %}
+    <input type="radio" name="{{ question.field }}" value="yes"> Yes
+    <input type="radio" name="{{ question.field }}" value="no"> No
+
+{% elif question.type == "number" %}
+    <input type="number" name="{{ question.field }}">
+
+{% elif question.type == "text" %}
+    <input type="text" name="{{ question.field }}" value="{{ question.default if question.default else '' }}" size="60">
+
+{% elif question.type == "policy" %}
+    <input type="checkbox" name="repeat">
+    Escalate if violation repeats 
+    <input type="number" name="repeat_count" value="3" style="width:60px">
+    times within 
+    <input type="number" name="repeat_hours" value="24" style="width:60px">
+    hours<br><br>
+
+    <input type="checkbox" name="score">
+    Escalate if safety score falls below 
+    <input type="number" name="score_threshold" value="60" style="width:60px"><br><br>
+
+    <input type="checkbox" name="duration">
+    Escalate if violation continues for more than 
+    <input type="number" name="duration_minutes" value="5" style="width:60px">
+    minutes<br>
+
+{% elif question.type == "logic" %}
+    {% for opt in question.options %}
+        <input type="radio" name="{{ question.field }}" value="{{ opt }}"> {{ opt }}<br>
+    {% endfor %}
+{% endif %}
+
+<br><br>
+<button type="submit">Next</button>
+
+</form>
+{% else %}
+<a href="/summary/{{ sid }}">Generate Agent</a>
+{% endif %}
+
+</body>
+</html>

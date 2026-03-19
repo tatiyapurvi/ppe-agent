@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Automation Flow</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f6f8fa;
+            padding: 40px;
+        }
+
+        h2 {
+            margin-bottom: 40px;
+        }
+
+        .canvas {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .node {
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin: 10px;
+            min-width: 220px;
+            text-align: center;
+            font-weight: 500;
+            border: 1px solid #ccc;
+        }
+
+        .event { background: #e3f2fd; }
+        .operation { background: #e8f5e9; }
+        .check { background: #fff3cd; }
+        .end { background: #fce4ec; }
+
+        .arrow {
+            margin: 5px;
+        }
+
+        .branch {
+            display: flex;
+            justify-content: center;
+            gap: 80px;
+        }
+
+        .branch-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .label {
+            font-size: 12px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Generated Automation Flow</h2>
+
+<div class="canvas">
+
+{% for node in nodes %}
+
+    {% if node.type == "Check" %}
+        <div class="node check">
+            <div><strong>Check Node</strong></div>
+            {{ node.label }}
+        </div>
+
+        <div class="branch">
+
+            <div class="branch-column">
+                <div class="label">YES</div>
+                {% for edge in edges %}
+                    {% if edge.from == node.id and edge.label == "YES" %}
+                        {% for n in nodes %}
+                            {% if n.id == edge.to %}
+                                <div class="node operation">
+                                    <strong>Operation</strong><br>
+                                    {{ n.label }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+                <div class="node end">
+                    <strong>End</strong><br>
+                    Escalation Complete
+                </div>
+            </div>
+
+            <div class="branch-column">
+                <div class="label">NO</div>
+                <div class="node end">
+                    <strong>End</strong><br>
+                    No Escalation
+                </div>
+            </div>
+
+        </div>
+
+    {% elif node.type == "Event" %}
+        <div class="node event">
+            <strong>Event Node</strong><br>
+            {{ node.label }}
+        </div>
+
+    {% elif node.type == "Operation" %}
+        <div class="node operation">
+            <strong>Operation Node</strong><br>
+            {{ node.label }}
+        </div>
+
+    {% endif %}
+
+{% endfor %}
+
+</div>
+
+</body>
+</html>
